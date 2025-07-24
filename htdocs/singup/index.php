@@ -8,8 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
-   body, html {
-      height: 100vh;
+   body, html {      
       margin: 0;
       font-family: Arial, sans-serif;
       background: linear-gradient(180deg, #0044cc, #001155);
@@ -37,7 +36,7 @@
       padding: 0.5rem 0;
       width: 100%;
       border: none;
-      margin-top: 2rem;
+      margin-top: 1rem;
       transition: background-color 0.3s ease, color 0.3s ease;
       user-select: none;
     }
@@ -139,6 +138,8 @@
           />
         </div>
       </div>
+      
+      <p>Já é cadastrado? <a href="/login" style="color: wheat"><b>Login</b></a></p>
 
       <button type="submit" class="btn btn-login">CADASTRO</button>
     </form>

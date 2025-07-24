@@ -31,7 +31,7 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar" aria-expanded="true">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="navbar-collapse collapse show" id="collapsibleNavbar" style="">
+    <div class="navbar-collapse collapse" id="collapsibleNavbar" style="">
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" href="/login">Login</a>

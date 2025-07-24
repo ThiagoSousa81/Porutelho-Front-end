@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="´pt-br">
+<html lang"pt-br">
 <head>
   <title>Portuelho - Aprenda Português</title>
   <link rel="shortcut icon" href="/src/logo.webp">

@@ -6,48 +6,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style_form.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
-   body, html {      
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #0044cc, #001155);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1rem;
-      color: white;
-    }
-    
-    .login-container {
-      background-color: #002299; 
-      padding: 30px;
-      border-radius: 0.5rem;
-      width: 100%;
-      max-width: 360px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-    .btn-login {
-      background-color: white;
-      color: #888;
-      font-weight: 600;
-      font-size: 1.1rem;
-      border-radius: 1.5rem;
-      padding: 0.5rem 0;
-      width: 100%;
-      border: none;
-      margin-top: 1rem;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      user-select: none;
-    }
-    .btn-login:hover,
-    .btn-login:focus {
-      background-color: #e0e0e0;
-      color: #555;
-      outline: none;
-    }
-  </style>
-  
 </head>
 <body>
   <main class="login-container">
@@ -115,7 +75,7 @@
             type="password"
             class="form-control"
             id="password"
-            placeholder="********"
+            placeholder="●●●●●●●●●●●●●●●"
             aria-describedby="password-addon"
             required
           />
@@ -132,7 +92,7 @@
             type="password"
             class="form-control"
             id="confirm-password"
-            placeholder="********"
+            placeholder="●●●●●●●●●●●●●●●"
             aria-describedby="confirm-password-addon"
             required
           />

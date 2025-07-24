@@ -23,16 +23,16 @@
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">LOGO</a>
+    <a class="navbar-brand" href="/"><img src="/src/logo.webp" alt="Logo"></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
     <ul class="navbar-nav collapse navbar-collapse" id="collapsibleNavbar">
       <li class="nav-item">
-        <a class="nav-link active" href="#">Login</a>
+        <a class="nav-link active" href="/login">Login</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Registro</a>
+        <a class="nav-link" href="/singup">Registro</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="#">Quem somos?</a>

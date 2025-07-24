@@ -11,9 +11,9 @@
 # Defina o diretório local que vai subir e onde o remoto vai receber 
 name: CI -> Deploy to My website
 on:
-  push:
-    branches:
-    - main
+  #push:
+  #  branches:
+  #  - main
   
   workflow_dispatch:
 jobs:

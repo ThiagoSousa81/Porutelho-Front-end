@@ -23,24 +23,27 @@
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/"><img src="/src/logo.webp" alt="Logo" style="height=50px"></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+    <a class="navbar-brand" href="/">
+    <img src="/src/logo.webp" alt="Logo" style="
+    height: 5vh;
+">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar" aria-expanded="true">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <ul class="navbar-nav collapse navbar-collapse" id="collapsibleNavbar">
-      <li class="nav-item">
-        <a class="nav-link active" href="/login">Login</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/singup">Registro</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Quem somos?</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
-      </li>
-    </ul>
+    <div class="navbar-collapse collapse show" id="collapsibleNavbar" style="">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/login">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/singup">Cadastre-se</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Saiba mais</a>
+        </li>    
+      </ul>
+    </div>
   </div>
 </nav>
 

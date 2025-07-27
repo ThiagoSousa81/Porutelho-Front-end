@@ -121,10 +121,10 @@ try {
                                 echo "✅ Query preparada com sucesso!<br>";
                                 echo "🔗 Fazendo bind dos parâmetros...<br>";
                                 
-                                $stmt->bind_param("sssssiiii", 
-                                    base64_encode($nome), 
-                                    base64_encode($email), 
-                                    base64_encode($username), 
+                                $stmt->bind_param("ssssssiiii", 
+                                    $nome, 
+                                    $email, 
+                                    $username, 
                                     $hash, 
                                     $data_cadastro, 
                                     $nivel, 

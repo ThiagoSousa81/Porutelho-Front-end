@@ -1,5 +1,9 @@
+<?php
+require "../php/crud.php";
+$cls = new database();
+?>
 <!DOCTYPE html>
-<html lang"pt-br">
+<html lang="pt-br">
 <head>
   <title>Portuelho - Cadastro</title>
   <link rel="shortcut icon" href="/src/logo.webp">
@@ -11,9 +15,53 @@
 </head>
 <body>
   <main class="login-container">
+
+    <?php 
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $user = addslashes($_POST['username'] ?? '');
+        $pwd = addslashes($_POST['password'] ?? '');
+
+        try {
+            $mysqli = $cls->GetLinkMySQLI();
+            $mysqli->set_charset("utf8mb4");
+
+            if ($mysqli->connect_error) {
+                echo '<div class="alert alert-danger">Erro de conexão: ' . $mysqli->connect_error . '</div>';
+                exit();
+            }
+
+            // Buscar usuário por email ou username
+            $sql = "SELECT * FROM ALUNO WHERE EMAIL_ALUNO = ? OR ARROBA_ALUNO = ?";
+            $stmt = $mysqli->prepare($sql);
+            $stmt->bind_param("ss", $user, $user);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result && $result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                if (password_verify($pwd, $row['SENHA_ALUNO'])) {
+                    // Login OK
+                    echo('<div class="alert alert-success alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button><strong>Portuelho 🐰🥕: </strong> Bem-vindo, ' . $row['NOME_ALUNO'] . '!</div>');
+                    // Aqui você pode iniciar sessão, redirecionar, etc.
+                } else {
+                    echo '<div class="alert alert-danger alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button><strong>Portuelho 🐰: </strong> Senha incorreta! </div>';
+                }
+            } else {
+                echo '<div class="alert alert-danger alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button><strong>Portuelho 🐰: </strong> Usuário ou email não encontrado!</div>';
+            }
+
+            $stmt->close();
+            $mysqli->close();
+
+        } catch (Exception $e) {
+            echo '<div class="alert alert-danger">Erro: ' . $e->getMessage() . '</div>';
+        }
+    }
+    ?>
+
     <h1 class="login-title text-center">Portuelho</h1>
 
-    <form>
+    <form method="POST">
       <div class="mb-3 position-relative">        
       <div class="mb-3 position-relative">
         <label for="username" class="form-label">Usuário ou Email</label>
@@ -25,6 +73,7 @@
             type="text"
             class="form-control"
             id="username"
+            name="username"
             placeholder="User123 ou email@exemplo.com"
             aria-describedby="username-addon"
             required
@@ -42,6 +91,7 @@
             type="password"
             class="form-control"
             id="password"
+            name="password"
             placeholder="●●●●●●●●●●●●●●●"
             aria-describedby="password-addon"
             required
@@ -52,7 +102,7 @@
       <p>Ainda não tem conta? <a href="/singup" style="color: wheat"><b>Cadastre-se</b></a></p>
 
       <button type="submit" class="btn btn-login">LOGIN</button>
-    </form>
+    </form>    
   </main>
 </body>
 </html>

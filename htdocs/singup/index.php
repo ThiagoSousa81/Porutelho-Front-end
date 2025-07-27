@@ -115,6 +115,14 @@ $cls = new database();
     </form>
 
     <?php
+      // Debug: Mostrar se os dados estão chegando via POST
+      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+          echo "<!-- DEBUG: Dados POST recebidos -->";
+          echo "<!-- Email: " . ($_POST['email'] ?? 'não definido') . " -->";
+          echo "<!-- Nome: " . ($_POST['name'] ?? 'não definido') . " -->";
+          echo "<!-- Username: " . ($_POST['username'] ?? 'não definido') . " -->";
+      }
+      
       if (isset($_POST['email']) && isset($_POST['name']) && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['confirm-password'])) {
           $nome = addslashes($_POST['name']);
           $email = strtolower(addslashes($_POST['email']));
@@ -122,10 +130,67 @@ $cls = new database();
           $pwd = addslashes($_POST['password']);
           $cpwd = addslashes($_POST['confirm-password']);                    
 
-          $mysqli = $cls->GetLinkMySQLI();
+          try {
+              $mysqli = $cls->GetLinkMySQLI();
+
+              // Verificar conexão
+              if ($mysqli->connect_error) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Erro de conexão: <?php echo $mysqli->connect_error; ?>
+                  </div>
+                  <?php
+                  exit();
+              }
+
+              // Verificar se a tabela existe
+              $result = $mysqli->query("SHOW TABLES LIKE 'ALUNO'");
+              if ($result->num_rows == 0) {
+                  ?>
+                  <div class="alert alert-warning alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Tabela ALUNO não existe. Criando automaticamente...
+                  </div>
+                  <?php
+                  
+                  $sql = "CREATE TABLE ALUNO (
+                      ID_ALUNO INT PRIMARY KEY AUTO_INCREMENT,
+                      NOME_ALUNO VARCHAR(100),
+                      EMAIL_ALUNO VARCHAR(100),
+                      ARROBA_ALUNO VARCHAR(100),
+                      SENHA_ALUNO VARCHAR(255),
+                      DATA_CADASTRO DATE,
+                      NIVEL INT DEFAULT 1,
+                      NIVEL_ESCRITA INT DEFAULT 1,
+                      OFENSIVA INT DEFAULT 0,
+                      QI INT DEFAULT 100,
+                      VOCABULARIO INT DEFAULT 1
+                  )";
+                  
+                  if (!$mysqli->query($sql)) {
+                      ?>
+                      <div class="alert alert-danger alert-dismissible">
+                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          <strong>Portuelho 🐰: </strong> Erro ao criar tabela: <?php echo $mysqli->error; ?>
+                      </div>
+                      <?php
+                      exit();
+                  }
+              }
 
           $sql = "SELECT EMAIL_ALUNO FROM ALUNO WHERE EMAIL_ALUNO = '" . base64_encode($email) . "'";
           $result = $mysqli->query($sql);
+
+          if (!$result) {
+              ?>
+              <div class="alert alert-danger alert-dismissible">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  <strong>Portuelho 🐰: </strong> Erro na consulta de email: <?php echo $mysqli->error; ?>
+              </div>
+              <?php
+              exit();
+          }
 
           if ($result->num_rows > 0) {
               ?>
@@ -134,9 +199,21 @@ $cls = new database();
                   <strong>Portuelho 🐰: </strong> Endereço de E-mail já cadastrado no sistema!
               </div>
               <?php
+              exit();
           }
+          
           $sql = "SELECT ARROBA_ALUNO FROM ALUNO WHERE ARROBA_ALUNO = '" . base64_encode($username) . "'";
           $result = $mysqli->query($sql);
+          
+          if (!$result) {
+              ?>
+              <div class="alert alert-danger alert-dismissible">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  <strong>Portuelho 🐰: </strong> Erro na consulta de usuário: <?php echo $mysqli->error; ?>
+              </div>
+              <?php
+              exit();
+          }
           if ($result->num_rows > 0) {
               ?>
               <div class="alert alert-danger alert-dismissible">
@@ -177,8 +254,29 @@ $cls = new database();
                       
 
                       $stmt = $mysqli->prepare("INSERT INTO `ALUNO` (`NOME_ALUNO`, `EMAIL_ALUNO`, `ARROBA_ALUNO`, `SENHA_ALUNO`, `DATA_CADASTRO`, `NIVEL`, `NIVEL_ESCRITA`, `OFENSIVA`, `QI`, `VOCABULARIO`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                      
+                      if (!$stmt) {
+                          ?>
+                          <div class="alert alert-danger alert-dismissible">
+                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                              <strong>Portuelho 🐰: </strong> Erro ao preparar query: <?php echo $mysqli->error; ?>
+                          </div>
+                          <?php
+                          exit();
+                      }
+                      
                       $stmt->bind_param("sssssiiii", base64_encode($nome), base64_encode($email), base64_encode($username), $hash, $data_cadastro, $nivel, $nivel_escrita, $ofensiva, $qi, $vocabulario);
-                      $stmt->execute();
+                      
+                      if (!$stmt->execute()) {
+                          ?>
+                          <div class="alert alert-danger alert-dismissible">
+                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                              <strong>Portuelho 🐰: </strong> Erro ao executar inserção: <?php echo $stmt->error; ?>
+                          </div>
+                          <?php
+                          exit();
+                      }
+                      
                       $stmt->close();
                       $mysqli->close();
 

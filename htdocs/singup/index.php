@@ -4,7 +4,7 @@ $cls = new database();
 ?>
 
 <!DOCTYPE html>
-<html lang"pt-br">
+<html lang="pt-br">
 <head>
   <title>Portuelho - Cadastro</title>
   <link rel="shortcut icon" href="/src/logo.webp">
@@ -16,7 +16,213 @@ $cls = new database();
 </head>
 <body>
   <main class="login-container">
-    <h1 class="login-title text-center">Portuelho</h1>
+
+    <?php
+      // Debug: Mostrar se os dados estão chegando via POST
+      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+          echo "<!-- DEBUG: Dados POST recebidos -->";
+          echo "<!-- Email: " . ($_POST['email'] ?? 'não definido') . " -->";
+          echo "<!-- Nome: " . ($_POST['name'] ?? 'não definido') . " -->";
+          echo "<!-- Username: " . ($_POST['username'] ?? 'não definido') . " -->";
+      }
+      
+      if (isset($_POST['email']) && isset($_POST['name']) && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['confirm-password'])) {
+          $nome = addslashes($_POST['name']);
+          $email = strtolower(addslashes($_POST['email']));
+          $username = str_replace('@', '', addslashes($_POST['username']));
+          $pwd = addslashes($_POST['password']);
+          $cpwd = addslashes($_POST['confirm-password']);                    
+
+          try {
+              $mysqli = $cls->GetLinkMySQLI();
+
+              // Definir o conjunto de caracteres para a conexão
+              $mysqli->set_charset("utf8mb4");
+
+              // Verificar conexão
+              if ($mysqli->connect_error) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Erro de conexão: <?php echo $mysqli->connect_error; ?>
+                  </div>
+                  <?php
+                  exit();
+              }
+
+              // Verificar se a tabela existe
+              $result = $mysqli->query("SHOW TABLES LIKE 'ALUNO'");
+              if ($result->num_rows == 0) {
+                  ?>
+                  <div class="alert alert-warning alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Tabela ALUNO não existe. Criando automaticamente...
+                  </div>
+                  <?php
+                  
+                  $sql = "CREATE TABLE ALUNO (
+                      ID_ALUNO INT PRIMARY KEY AUTO_INCREMENT,
+                      NOME_ALUNO VARCHAR(100),
+                      EMAIL_ALUNO VARCHAR(100),
+                      ARROBA_ALUNO VARCHAR(100),
+                      SENHA_ALUNO VARCHAR(255),
+                      DATA_CADASTRO DATE,
+                      NIVEL INT DEFAULT 1,
+                      NIVEL_ESCRITA INT DEFAULT 1,
+                      OFENSIVA INT DEFAULT 0,
+                      QI INT DEFAULT 100,
+                      VOCABULARIO INT DEFAULT 1
+                  )";
+                  
+                  if (!$mysqli->query($sql)) {
+                      ?>
+                      <div class="alert alert-danger alert-dismissible">
+                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          <strong>Portuelho 🐰: </strong> Erro ao criar tabela: <?php echo $mysqli->error; ?>
+                      </div>
+                      <?php
+                      exit();
+                  }
+              }
+
+              $sql = "SELECT EMAIL_ALUNO FROM ALUNO WHERE EMAIL_ALUNO = '" . $email . "'";
+              $result = $mysqli->query($sql);
+
+              if (!$result) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Erro na consulta de email: <?php echo $mysqli->error; ?>
+                  </div>
+                  <?php
+                  exit();
+              }
+
+              if ($result->num_rows > 0) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Endereço de E-mail já cadastrado no sistema!
+                  </div>
+                  <?php
+                  exit();
+              }
+              
+              $sql = "SELECT ARROBA_ALUNO FROM ALUNO WHERE ARROBA_ALUNO = '" . $username . "'";
+              $result = $mysqli->query($sql);
+              
+              if (!$result) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Erro na consulta de usuário: <?php echo $mysqli->error; ?>
+                  </div>
+                  <?php
+                  exit();
+              }
+              
+              if ($result->num_rows > 0) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Este @ de usuário já existe no sistema!
+                  </div>
+                  <?php
+              } else {
+                  if (!empty($nome) && !empty($email) && !empty($username) && !empty($pwd) && !empty($cpwd)) {
+                      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                          ?>
+                          <div class="alert alert-danger alert-dismissible">
+                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                              <strong>Portuelho 🐰: </strong> Endereço de E-mail inválido!
+                          </div>
+                          <?php
+                      } else {
+                          if ($pwd == $cpwd) {
+
+                              //Definindo data de cadastro
+                              $timezone = new DateTimeZone('America/Sao_Paulo');
+                              $now = new DateTime('now', $timezone);
+                              $data_cadastro = $now->format('Y-m-d');
+
+                              // Valores padrão para campos opcionais
+                              $nivel = 1;
+                              $nivel_escrita = 1;
+                              $ofensiva = 0;
+                              $qi = 100;
+                              $vocabulario = 1;
+
+                              // Hash da senha
+                              $hash = password_hash($pwd, PASSWORD_DEFAULT);
+                              
+
+                              $stmt = $mysqli->prepare("INSERT INTO `ALUNO` (`NOME_ALUNO`, `EMAIL_ALUNO`, `ARROBA_ALUNO`, `SENHA_ALUNO`, `DATA_CADASTRO`, `NIVEL`, `NIVEL_ESCRITA`, `OFENSIVA`, `QI`, `VOCABULARIO`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                              
+                              if (!$stmt) {
+                                  ?>
+                                  <div class="alert alert-danger alert-dismissible">
+                                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                      <strong>Portuelho 🐰: </strong> Erro ao preparar query: <?php echo $mysqli->error; ?>
+                                  </div>
+                                  <?php
+                                  exit();
+                              }
+                              
+                              $stmt->bind_param("ssssssiiii", $nome, $email, $username, $hash, $data_cadastro, $nivel, $nivel_escrita, $ofensiva, $qi, $vocabulario);
+                              
+                              if (!$stmt->execute()) {
+                                  ?>
+                                  <div class="alert alert-danger alert-dismissible">
+                                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                      <strong>Portuelho 🐰: </strong> Erro ao executar inserção: <?php echo $stmt->error; ?>
+                                  </div>
+                                  <?php
+                                  exit();
+                              }
+                              
+                              $stmt->close();
+                              $mysqli->close();
+
+                              ?>
+                              <!-- Mensagem de Sucesso -->
+                              <div class="alert alert-success alert-dismissible">
+                                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                  <strong>Portuelho 🐰🥕: </strong> Usuário cadastrado com sucesso!
+                              </div>
+                              <?php
+
+                          } else {
+                              ?>
+                              <div class="alert alert-danger alert-dismissible">
+                                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                  <strong>Portuelho 🐰: </strong> As senhas não conferem!
+                              </div>
+                              <?php
+                          }
+                      }
+                  } else {
+                      ?>
+                      <div class="alert alert-danger alert-dismissible">
+                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          <strong>Portuelho 🐰: </strong> Preencha todos os campos!
+                      </div>
+                      <?php
+                  }
+              }
+
+          } catch (Exception $e) {
+              ?>
+              <div class="alert alert-danger alert-dismissible">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  <strong>Portuelho 🐰: </strong> Erro: <?php echo $e->getMessage(); ?>
+              </div>
+              <?php
+          }
+        }      
+    ?>
+
+
+    <h1 class="login-title text-center mt-1">Portuelho</h1>
 
     <form method="POST">
       <div class="mb-3 position-relative">
@@ -112,209 +318,7 @@ $cls = new database();
       <p>Já é cadastrado? <a href="/login" style="color: wheat"><b>Login</b></a></p>
 
       <button type="submit" class="btn btn-login">CADASTRO</button>
-    </form>
-
-    <?php
-      // Debug: Mostrar se os dados estão chegando via POST
-      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-          echo "<!-- DEBUG: Dados POST recebidos -->";
-          echo "<!-- Email: " . ($_POST['email'] ?? 'não definido') . " -->";
-          echo "<!-- Nome: " . ($_POST['name'] ?? 'não definido') . " -->";
-          echo "<!-- Username: " . ($_POST['username'] ?? 'não definido') . " -->";
-      }
-      
-      if (isset($_POST['email']) && isset($_POST['name']) && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['confirm-password'])) {
-          $nome = addslashes($_POST['name']);
-          $email = strtolower(addslashes($_POST['email']));
-          $username = str_replace('@', '', addslashes($_POST['username']));
-          $pwd = addslashes($_POST['password']);
-          $cpwd = addslashes($_POST['confirm-password']);                    
-
-          try {
-              $mysqli = $cls->GetLinkMySQLI();
-
-              // Verificar conexão
-              if ($mysqli->connect_error) {
-                  ?>
-                  <div class="alert alert-danger alert-dismissible">
-                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                      <strong>Portuelho 🐰: </strong> Erro de conexão: <?php echo $mysqli->connect_error; ?>
-                  </div>
-                  <?php
-                  exit();
-              }
-
-              // Verificar se a tabela existe
-              $result = $mysqli->query("SHOW TABLES LIKE 'ALUNO'");
-              if ($result->num_rows == 0) {
-                  ?>
-                  <div class="alert alert-warning alert-dismissible">
-                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                      <strong>Portuelho 🐰: </strong> Tabela ALUNO não existe. Criando automaticamente...
-                  </div>
-                  <?php
-                  
-                  $sql = "CREATE TABLE ALUNO (
-                      ID_ALUNO INT PRIMARY KEY AUTO_INCREMENT,
-                      NOME_ALUNO VARCHAR(100),
-                      EMAIL_ALUNO VARCHAR(100),
-                      ARROBA_ALUNO VARCHAR(100),
-                      SENHA_ALUNO VARCHAR(255),
-                      DATA_CADASTRO DATE,
-                      NIVEL INT DEFAULT 1,
-                      NIVEL_ESCRITA INT DEFAULT 1,
-                      OFENSIVA INT DEFAULT 0,
-                      QI INT DEFAULT 100,
-                      VOCABULARIO INT DEFAULT 1
-                  )";
-                  
-                  if (!$mysqli->query($sql)) {
-                      ?>
-                      <div class="alert alert-danger alert-dismissible">
-                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                          <strong>Portuelho 🐰: </strong> Erro ao criar tabela: <?php echo $mysqli->error; ?>
-                      </div>
-                      <?php
-                      exit();
-                  }
-              }
-
-              $sql = "SELECT EMAIL_ALUNO FROM ALUNO WHERE EMAIL_ALUNO = '" . base64_encode($email) . "'";
-              $result = $mysqli->query($sql);
-
-              if (!$result) {
-                  ?>
-                  <div class="alert alert-danger alert-dismissible">
-                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                      <strong>Portuelho 🐰: </strong> Erro na consulta de email: <?php echo $mysqli->error; ?>
-                  </div>
-                  <?php
-                  exit();
-              }
-
-              if ($result->num_rows > 0) {
-                  ?>
-                  <div class="alert alert-danger alert-dismissible">
-                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                      <strong>Portuelho 🐰: </strong> Endereço de E-mail já cadastrado no sistema!
-                  </div>
-                  <?php
-                  exit();
-              }
-              
-              $sql = "SELECT ARROBA_ALUNO FROM ALUNO WHERE ARROBA_ALUNO = '" . base64_encode($username) . "'";
-              $result = $mysqli->query($sql);
-              
-              if (!$result) {
-                  ?>
-                  <div class="alert alert-danger alert-dismissible">
-                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                      <strong>Portuelho 🐰: </strong> Erro na consulta de usuário: <?php echo $mysqli->error; ?>
-                  </div>
-                  <?php
-                  exit();
-              }
-              
-              if ($result->num_rows > 0) {
-                  ?>
-                  <div class="alert alert-danger alert-dismissible">
-                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                      <strong>Portuelho 🐰: </strong> Este @ de usuário já existe no sistema!
-                  </div>
-                  <?php
-              } else {
-                  if (!empty($nome) && !empty($email) && !empty($username) && !empty($pwd) && !empty($cpwd)) {
-                      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                          ?>
-                          <div class="alert alert-danger alert-dismissible">
-                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                              <strong>Portuelho 🐰: </strong> Endereço de E-mail inválido!
-                          </div>
-                          <?php
-                      } else {
-                          if ($pwd == $cpwd) {
-
-                              //Definindo data de cadastro
-                              $timezone = new DateTimeZone('America/Sao_Paulo');
-                              $now = new DateTime('now', $timezone);
-                              $data_cadastro = $now->format('Y-m-d');
-
-                              // Valores padrão para campos opcionais
-                              $nivel = 1;
-                              $nivel_escrita = 1;
-                              $ofensiva = 0;
-                              $qi = 100;
-                              $vocabulario = 1;
-
-                              // Hash da senha
-                              $hash = password_hash($pwd, PASSWORD_DEFAULT);
-                              
-
-                              $stmt = $mysqli->prepare("INSERT INTO `ALUNO` (`NOME_ALUNO`, `EMAIL_ALUNO`, `ARROBA_ALUNO`, `SENHA_ALUNO`, `DATA_CADASTRO`, `NIVEL`, `NIVEL_ESCRITA`, `OFENSIVA`, `QI`, `VOCABULARIO`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                              
-                              if (!$stmt) {
-                                  ?>
-                                  <div class="alert alert-danger alert-dismissible">
-                                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                      <strong>Portuelho 🐰: </strong> Erro ao preparar query: <?php echo $mysqli->error; ?>
-                                  </div>
-                                  <?php
-                                  exit();
-                              }
-                              
-                              $stmt->bind_param("sssssiiii", base64_encode($nome), base64_encode($email), base64_encode($username), $hash, $data_cadastro, $nivel, $nivel_escrita, $ofensiva, $qi, $vocabulario);
-                              
-                              if (!$stmt->execute()) {
-                                  ?>
-                                  <div class="alert alert-danger alert-dismissible">
-                                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                      <strong>Portuelho 🐰: </strong> Erro ao executar inserção: <?php echo $stmt->error; ?>
-                                  </div>
-                                  <?php
-                                  exit();
-                              }
-                              
-                              $stmt->close();
-                              $mysqli->close();
-
-                              ?>
-                              <!-- Mensagem de Sucesso -->
-                              <div class="alert alert-success alert-dismissible">
-                                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                  <strong>Portuelho 🐰🥕: </strong> Usuário cadastrado com sucesso!
-                              </div>
-                              <?php
-
-                          } else {
-                              ?>
-                              <div class="alert alert-danger alert-dismissible">
-                                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                  <strong>Portuelho 🐰: </strong> As senhas não conferem!
-                              </div>
-                              <?php
-                          }
-                      }
-                  } else {
-                      ?>
-                      <div class="alert alert-danger alert-dismissible">
-                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                          <strong>Portuelho 🐰: </strong> Preencha todos os campos!
-                      </div>
-                      <?php
-                  }
-              }
-
-          } catch (Exception $e) {
-              ?>
-              <div class="alert alert-danger alert-dismissible">
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                  <strong>Portuelho 🐰: </strong> Erro: <?php echo $e->getMessage(); ?>
-              </div>
-              <?php
-          }
-        }      
-    ?>
-
+    </form>    
   </main>
 </body>
 </html>

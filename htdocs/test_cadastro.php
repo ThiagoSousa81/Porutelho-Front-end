@@ -1,9 +1,15 @@
 <?php
+// Mostrar todos os erros para debug
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Arquivo de teste para o cadastro - dentro de htdocs
 echo "<h1>Teste de Cadastro - Portuelho 🐰</h1>";
 
 // Incluir o arquivo de conexão
 require_once "php/crud.php";
+
+echo "📁 Arquivo crud.php incluído com sucesso!<br>";
 
 // Simular dados de teste
 $_POST['email'] = 'teste' . time() . '@exemplo.com'; // Email único
@@ -19,10 +25,29 @@ echo "Username: " . $_POST['username'] . "<br>";
 echo "Senha: " . $_POST['password'] . "<br><br>";
 
 try {
+    echo "🔄 Criando instância da classe database...<br>";
     $cls = new database();
-    $mysqli = $cls->GetLinkMySQLI();
+    echo "✅ Classe criada com sucesso!<br>";
     
+    echo "🔗 Estabelecendo conexão MySQL...<br>";
+    $mysqli = $cls->GetLinkMySQLI();
     echo "✅ Conexão estabelecida!<br>";
+    
+    // Verificar conexão
+    if ($mysqli->connect_error) {
+        echo "❌ Erro de conexão: " . $mysqli->connect_error . "<br>";
+        exit();
+    }
+    
+    // Teste básico de conectividade
+    echo "🧪 Testando conectividade básica...<br>";
+    $result = $mysqli->query("SELECT 1 as test");
+    if ($result) {
+        echo "✅ Conectividade básica OK!<br>";
+    } else {
+        echo "❌ Problema na conectividade: " . $mysqli->error . "<br>";
+        exit();
+    }
     
     // Verificar estrutura da tabela
     $result = $mysqli->query("DESCRIBE ALUNO");
@@ -85,11 +110,17 @@ try {
                             $hash = password_hash($pwd, PASSWORD_DEFAULT);
                             
                             echo "🔒 Hash da senha criado: " . substr($hash, 0, 20) . "...<br>";
+                            echo "📅 Data de cadastro: " . $data_cadastro . "<br>";
+                            echo "📊 Valores padrão definidos<br>";
                             
                             // Inserir no banco
+                            echo "🔄 Preparando query...<br>";
                             $stmt = $mysqli->prepare("INSERT INTO ALUNO (NOME_ALUNO, EMAIL_ALUNO, ARROBA_ALUNO, SENHA_ALUNO, DATA_CADASTRO, NIVEL, NIVEL_ESCRITA, OFENSIVA, QI, VOCABULARIO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                             
                             if ($stmt) {
+                                echo "✅ Query preparada com sucesso!<br>";
+                                echo "🔗 Fazendo bind dos parâmetros...<br>";
+                                
                                 $stmt->bind_param("sssssiiii", 
                                     base64_encode($nome), 
                                     base64_encode($email), 
@@ -102,6 +133,11 @@ try {
                                     $qi, 
                                     $vocabulario
                                 );
+                                
+                                echo "✅ Parâmetros vinculados!<br>";
+                                flush(); // Forçar saída
+                                echo "🚀 Executando inserção...<br>";
+                                flush(); // Forçar saída;
                                 
                                 if ($stmt->execute()) {
                                     echo "✅ <strong>Usuário cadastrado com sucesso!</strong><br>";
@@ -125,9 +161,12 @@ try {
                                         echo "</table>";
                                         
                                         echo "<h3>🎉 SUCESSO! O sistema de cadastro está funcionando perfeitamente!</h3>";
+                                    } else {
+                                        echo "⚠️ Inserção realizada mas não foi possível verificar os dados.<br>";
                                     }
                                 } else {
                                     echo "❌ Erro ao inserir: " . $stmt->error . "<br>";
+                                    echo "📝 Erro MySQL: " . $mysqli->error . "<br>";
                                 }
                                 $stmt->close();
                             } else {
@@ -149,7 +188,13 @@ try {
     $mysqli->close();
     
 } catch (Exception $e) {
-    echo "❌ Erro: " . $e->getMessage() . "<br>";
+    echo "❌ Erro capturado: " . $e->getMessage() . "<br>";
+    echo "📄 Arquivo: " . $e->getFile() . "<br>";
+    echo "📍 Linha: " . $e->getLine() . "<br>";
+} catch (Error $e) {
+    echo "❌ Erro fatal: " . $e->getMessage() . "<br>";
+    echo "📄 Arquivo: " . $e->getFile() . "<br>";
+    echo "📍 Linha: " . $e->getLine() . "<br>";
 }
 ?>
 

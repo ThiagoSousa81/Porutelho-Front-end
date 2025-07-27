@@ -179,139 +179,142 @@ $cls = new database();
                   }
               }
 
-          $sql = "SELECT EMAIL_ALUNO FROM ALUNO WHERE EMAIL_ALUNO = '" . base64_encode($email) . "'";
-          $result = $mysqli->query($sql);
+              $sql = "SELECT EMAIL_ALUNO FROM ALUNO WHERE EMAIL_ALUNO = '" . base64_encode($email) . "'";
+              $result = $mysqli->query($sql);
 
-          if (!$result) {
-              ?>
-              <div class="alert alert-danger alert-dismissible">
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                  <strong>Portuelho 🐰: </strong> Erro na consulta de email: <?php echo $mysqli->error; ?>
-              </div>
-              <?php
-              exit();
-          }
-
-          if ($result->num_rows > 0) {
-              ?>
-              <div class="alert alert-danger alert-dismissible">
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                  <strong>Portuelho 🐰: </strong> Endereço de E-mail já cadastrado no sistema!
-              </div>
-              <?php
-              exit();
-          }
-          
-          $sql = "SELECT ARROBA_ALUNO FROM ALUNO WHERE ARROBA_ALUNO = '" . base64_encode($username) . "'";
-          $result = $mysqli->query($sql);
-          
-          if (!$result) {
-              ?>
-              <div class="alert alert-danger alert-dismissible">
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                  <strong>Portuelho 🐰: </strong> Erro na consulta de usuário: <?php echo $mysqli->error; ?>
-              </div>
-              <?php
-              exit();
-          }
-          if ($result->num_rows > 0) {
-              ?>
-              <div class="alert alert-danger alert-dismissible">
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                  <strong>Portuelho 🐰: </strong> Este @ de usuário já existe no sistema!
-              </div>
-              <?php
-          } else {
-              if (!empty($nome) && !empty($email) && !empty($username) && !empty($pwd) && !empty($cpwd)) {
-                  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                      ?>
-                      <div class="alert alert-danger alert-dismissible">
-                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                          <strong>Portuelho 🐰: </strong> Endereço de E-mail inválido!
-                      </div>
-                      <?php
-                  } else {
-                      if ($pwd == $cpwd) {
-
-                      //Definindo data de cadastro
-                      $timezone = new DateTimeZone('America/Sao_Paulo');
-                      $now = new DateTime('now', $timezone);
-                      $data_cadastro = $now->format('Y-m-d');
-
-                      // Valores padrão para campos opcionais
-                      $nivel = 1;
-                      $nivel_escrita = 1;
-                      $ofensiva = 0;
-                      $qi = 100;
-                      $vocabulario = 1;
-
-                      // Hash da senha
-                      $hash = password_hash($pwd, PASSWORD_ARGON2ID, [
-                          'memory_cost' => 1 << 17, // 128 MB
-                          'time_cost'   => 4,       // 4 iterações
-                          'threads'     => 2,       // 2 threads paralelas
-                      ]);
-                      
-
-                      $stmt = $mysqli->prepare("INSERT INTO `ALUNO` (`NOME_ALUNO`, `EMAIL_ALUNO`, `ARROBA_ALUNO`, `SENHA_ALUNO`, `DATA_CADASTRO`, `NIVEL`, `NIVEL_ESCRITA`, `OFENSIVA`, `QI`, `VOCABULARIO`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                      
-                      if (!$stmt) {
-                          ?>
-                          <div class="alert alert-danger alert-dismissible">
-                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                              <strong>Portuelho 🐰: </strong> Erro ao preparar query: <?php echo $mysqli->error; ?>
-                          </div>
-                          <?php
-                          exit();
-                      }
-                      
-                      $stmt->bind_param("sssssiiii", base64_encode($nome), base64_encode($email), base64_encode($username), $hash, $data_cadastro, $nivel, $nivel_escrita, $ofensiva, $qi, $vocabulario);
-                      
-                      if (!$stmt->execute()) {
-                          ?>
-                          <div class="alert alert-danger alert-dismissible">
-                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                              <strong>Portuelho 🐰: </strong> Erro ao executar inserção: <?php echo $stmt->error; ?>
-                          </div>
-                          <?php
-                          exit();
-                      }
-                      
-                      $stmt->close();
-                      $mysqli->close();
-
-
-                      ?>
-                      <!-- Mensagem de Sucesso -->
-                      <div class="alert alert-success alert-dismissible">
-                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                          <strong>Portuelho 🐰🥕: </strong> Usuário cadastrado com sucesso!
-                      </div>
-                      <?php
-
-
-                  } else {
-                      ?>
-                      <div class="alert alert-danger alert-dismissible">
-                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                          <strong>Portuelho 🐰: </strong> As senhas não conferem!
-                      </div>
-                      <?php
-                  }
-                  }
-              } else {
+              if (!$result) {
                   ?>
                   <div class="alert alert-danger alert-dismissible">
                       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                      <strong>Portuelho 🐰: </strong> Preencha todos os campos!
+                      <strong>Portuelho 🐰: </strong> Erro na consulta de email: <?php echo $mysqli->error; ?>
                   </div>
                   <?php
+                  exit();
               }
-          }
 
-      }
+              if ($result->num_rows > 0) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Endereço de E-mail já cadastrado no sistema!
+                  </div>
+                  <?php
+                  exit();
+              }
+              
+              $sql = "SELECT ARROBA_ALUNO FROM ALUNO WHERE ARROBA_ALUNO = '" . base64_encode($username) . "'";
+              $result = $mysqli->query($sql);
+              
+              if (!$result) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Erro na consulta de usuário: <?php echo $mysqli->error; ?>
+                  </div>
+                  <?php
+                  exit();
+              }
+              
+              if ($result->num_rows > 0) {
+                  ?>
+                  <div class="alert alert-danger alert-dismissible">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Portuelho 🐰: </strong> Este @ de usuário já existe no sistema!
+                  </div>
+                  <?php
+              } else {
+                  if (!empty($nome) && !empty($email) && !empty($username) && !empty($pwd) && !empty($cpwd)) {
+                      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                          ?>
+                          <div class="alert alert-danger alert-dismissible">
+                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                              <strong>Portuelho 🐰: </strong> Endereço de E-mail inválido!
+                          </div>
+                          <?php
+                      } else {
+                          if ($pwd == $cpwd) {
+
+                              //Definindo data de cadastro
+                              $timezone = new DateTimeZone('America/Sao_Paulo');
+                              $now = new DateTime('now', $timezone);
+                              $data_cadastro = $now->format('Y-m-d');
+
+                              // Valores padrão para campos opcionais
+                              $nivel = 1;
+                              $nivel_escrita = 1;
+                              $ofensiva = 0;
+                              $qi = 100;
+                              $vocabulario = 1;
+
+                              // Hash da senha
+                              $hash = password_hash($pwd, PASSWORD_DEFAULT);
+                              
+
+                              $stmt = $mysqli->prepare("INSERT INTO `ALUNO` (`NOME_ALUNO`, `EMAIL_ALUNO`, `ARROBA_ALUNO`, `SENHA_ALUNO`, `DATA_CADASTRO`, `NIVEL`, `NIVEL_ESCRITA`, `OFENSIVA`, `QI`, `VOCABULARIO`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                              
+                              if (!$stmt) {
+                                  ?>
+                                  <div class="alert alert-danger alert-dismissible">
+                                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                      <strong>Portuelho 🐰: </strong> Erro ao preparar query: <?php echo $mysqli->error; ?>
+                                  </div>
+                                  <?php
+                                  exit();
+                              }
+                              
+                              $stmt->bind_param("sssssiiii", base64_encode($nome), base64_encode($email), base64_encode($username), $hash, $data_cadastro, $nivel, $nivel_escrita, $ofensiva, $qi, $vocabulario);
+                              
+                              if (!$stmt->execute()) {
+                                  ?>
+                                  <div class="alert alert-danger alert-dismissible">
+                                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                      <strong>Portuelho 🐰: </strong> Erro ao executar inserção: <?php echo $stmt->error; ?>
+                                  </div>
+                                  <?php
+                                  exit();
+                              }
+                              
+                              $stmt->close();
+                              $mysqli->close();
+
+                              ?>
+                              <!-- Mensagem de Sucesso -->
+                              <div class="alert alert-success alert-dismissible">
+                                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                  <strong>Portuelho 🐰🥕: </strong> Usuário cadastrado com sucesso!
+                              </div>
+                              <?php
+
+                          } else {
+                              ?>
+                              <div class="alert alert-danger alert-dismissible">
+                                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                  <strong>Portuelho 🐰: </strong> As senhas não conferem!
+                              </div>
+                              <?php
+                          }
+                      }
+                  } else {
+                      ?>
+                      <div class="alert alert-danger alert-dismissible">
+                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          <strong>Portuelho 🐰: </strong> Preencha todos os campos!
+                      </div>
+                      <?php
+                  }
+              }
+
+          } catch (Exception $e) {
+              ?>
+              <div class="alert alert-danger alert-dismissible">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  <strong>Portuelho 🐰: </strong> Erro: <?php echo $e->getMessage(); ?>
+              </div>
+              <?php
+          }
+        }      
     ?>
+
   </main>
 </body>
 </html>
-

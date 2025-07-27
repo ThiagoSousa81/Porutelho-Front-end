@@ -39,6 +39,9 @@ try {
         exit();
     }
     
+    // Definir o conjunto de caracteres para a conexão
+    $mysqli->set_charset("utf8mb4");
+    
     // Teste básico de conectividade
     echo "🧪 Testando conectividade básica...<br>";
     $result = $mysqli->query("SELECT 1 as test");

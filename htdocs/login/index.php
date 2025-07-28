@@ -5,7 +5,7 @@ $cls = new database();
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <title>Portuelho - Cadastro</title>
+  <title>Portuelho - Login</title>
   <link rel="shortcut icon" href="/src/logo.webp">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,7 +51,7 @@ $cls = new database();
                     // Configurando cookie como seguro (apenas em conexões HTTPS)
                     ini_set('session.cookie_secure', 1);
                     session_start();
-                    $_SESSION['ID_USER'] = $row['ID_USER'];
+                    $_SESSION['ID_ALUNO'] = $row['ID_ALUNO'];
 
                     $stmt->close();
                     $mysqli->close();

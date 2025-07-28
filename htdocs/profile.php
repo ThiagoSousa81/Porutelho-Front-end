@@ -1,9 +1,27 @@
+<?php
+require_once "php/auth.php";
+require_once "php/crud.php";
+$cls = new database();
+
+// Buscar dados do usuário logado
+$mysqli = $cls->GetLinkMySQLI();
+$mysqli->set_charset("utf8mb4");
+$id_aluno = $_SESSION['ID_ALUNO'];
+$sql = "SELECT * FROM ALUNO WHERE ID_ALUNO = ?";
+$stmt = $mysqli->prepare($sql);
+$stmt->bind_param("i", $id_aluno);
+$stmt->execute();
+$result = $stmt->get_result();
+$aluno = $result->fetch_assoc();
+$stmt->close();
+$mysqli->close();
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANG3L Profile</title>
+    <title>🐰 <?php echo htmlspecialchars($aluno['NOME_ALUNO'] ?? ''); ?> - Portuelho</title>
     <link rel="shortcut icon" href="/src/logo.webp">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -299,7 +317,7 @@
     <div class="profile-container">
         <!-- Header -->
         <div class="header">
-            <h1>ANG3L_NIGHTTAR</h1>
+            <h1><?php echo htmlspecialchars($aluno['ARROBA_ALUNO'] ?? ''); ?></h1>
             <div class="settings-icon">
                 <i class="bi bi-gear"></i>
             </div>
@@ -310,13 +328,13 @@
             <div class="avatar-container">
                 <div class="avatar"></div>
                 <div class="level-badge">
-                    Nível: OURO
+                    Nível: <?php echo htmlspecialchars($aluno['NIVEL'] ?? ''); ?>
                 </div>
             </div>
             
-            <div class="username">ANG3L</div>
-            <div class="handle">Ang3l_nighttar</div>
-            <div class="join-date">Aqui desde 2023</div>
+            <div class="username"><?php echo htmlspecialchars($aluno['NOME_ALUNO'] ?? ''); ?></div>
+            <div class="handle"><?php echo htmlspecialchars($aluno['ARROBA_ALUNO'] ?? ''); ?></div>
+            <div class="join-date">Aqui desde <?php echo htmlspecialchars($aluno['DATA_CADASTRO'] ?? ''); ?></div>
             
             <!-- Social Stats -->
             <div class="social-stats">
@@ -340,7 +358,7 @@
                     <div class="stat-icon">
                         <i class="bi bi-fire"></i>
                     </div>
-                    <div class="stat-number">2807</div>
+                    <div class="stat-number"><?php echo htmlspecialchars($aluno['OFENSIVA'] ?? ''); ?></div>
                     <div class="stat-label">Ofensiva</div>
                 </div>
                 
@@ -348,7 +366,7 @@
                     <div class="stat-icon">
                         <i class="bi bi-lightbulb"></i>
                     </div>
-                    <div class="stat-number">220</div>
+                    <div class="stat-number"><?php echo htmlspecialchars($aluno['QI'] ?? ''); ?></div>
                     <div class="stat-label">Nível de QI</div>
                 </div>
                 
@@ -356,7 +374,7 @@
                     <div class="stat-icon">
                         <i class="bi bi-book"></i>
                     </div>
-                    <div class="stat-number">30000</div>
+                    <div class="stat-number"><?php echo htmlspecialchars($aluno['VOCABULARIO'] ?? ''); ?></div>
                     <div class="stat-label">Vocabulário</div>
                 </div>
                 
@@ -365,7 +383,7 @@
                         <i class="bi bi-gem"></i>
                     </div>
                     <div class="stat-number">💎</div>
-                    <div class="stat-label">Nível de escritor<br>Diamante</div>
+                    <div class="stat-label">Nível de escritor<br><?php echo htmlspecialchars($aluno['NIVEL_ESCRITA'] ?? ''); ?></div>
                 </div>
             </div>
         </div>
@@ -374,7 +392,7 @@
         <div class="action-buttons">
             <button class="btn-friendship">
                 <i class="bi bi-person-plus"></i>
-                Fazer Amizade +
+                Seguir +
             </button>
             <button class="btn-profile">
                 <i class="bi bi-person-circle"></i>

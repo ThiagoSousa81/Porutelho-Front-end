@@ -5,7 +5,7 @@ $cls = new database();
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <title>Portuelho - Cadastro</title>
+  <title>Portuelho - Login</title>
   <link rel="shortcut icon" href="/src/logo.webp">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,6 +43,20 @@ $cls = new database();
                     // Login OK
                     echo('<div class="alert alert-success alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button><strong>Portuelho 🐰🥕: </strong> Bem-vindo, ' . $row['NOME_ALUNO'] . '!</div>');
                     // Aqui você pode iniciar sessão, redirecionar, etc.
+
+                    // Configuração do domínio do cookie da sessão
+                    ini_set('session.cookie_domain', 'portuelho.free.nf');
+                    //Configurando tempo de limite da sessão
+                    ini_set('session.gc_maxlifetime', 3600);
+                    // Configurando cookie como seguro (apenas em conexões HTTPS)
+                    ini_set('session.cookie_secure', 1);
+                    session_start();
+                    $_SESSION['ID_ALUNO'] = $row['ID_ALUNO'];
+
+                    $stmt->close();
+                    $mysqli->close();
+
+                    header("Location: /profile.php");
                 } else {
                     echo '<div class="alert alert-danger alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button><strong>Portuelho 🐰: </strong> Senha incorreta! </div>';
                 }
@@ -67,7 +81,7 @@ $cls = new database();
         <label for="username" class="form-label">Usuário ou Email</label>
         <div class="input-group">
           <span class="input-group-text" id="username-addon">
-          	👤
+            👤
           </span>
           <input
             type="text"

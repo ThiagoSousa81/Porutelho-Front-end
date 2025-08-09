@@ -318,7 +318,7 @@ $mysqli->close();
         <!-- Header -->
         <div class="header">
             <h1><?php echo htmlspecialchars($aluno['ARROBA_ALUNO'] ?? ''); ?></h1>
-            <button type="button" class="btn btn-danger">Sair</button>
+            <a href="/php/exit.php" style="color: white"><button type="button" class="btn btn-danger">Sair</button></a>
             <div class="settings-icon">
                 <i class="bi bi-gear"></i>
             </div>
